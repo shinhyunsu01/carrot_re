@@ -5,14 +5,14 @@ const Community: NextPage = () => {
 		<div className="py-15 space-y-6 px-4 ">
 			{[1, 2, 3, 4, 5, 6].map((_, i) => (
 				<div key={i} className="flex flex-col items-start">
-					<span className="flex items-center px-2.5 py-0 rounded-full text-xs font-medium bg-gray-100 text-gray-800s">
+					<span className="flex items-center px-2.5 py-0 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
 						동네 질문
 					</span>
 					<div className="mt-2 text-gray-700">
 						<span className="text-orange-500 font-medium">Q.</span> What is the
 						best restaurant?
 					</div>
-					<div className="mt-5 flex items-center justify-between w-full text-gray-600 fon-medium text-xs ">
+					<div className="mt-5 flex items-center justify-between w-full text-gray-600 font-medium text-xs ">
 						<span>니꼬</span>
 						<span>18시가 전</span>
 					</div>
