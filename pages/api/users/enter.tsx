@@ -19,13 +19,14 @@ async function handler(
 						...user,
 					},
 					create: {
-						name: "Annoymouss",
+						name: "Annoymous",
 						...user,
 					},
 				},
 			},
 		},
 	});
+	console.log(token);
 
 	return res.json({
 		ok: true,

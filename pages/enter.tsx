@@ -1,3 +1,4 @@
+import Button from "components/button";
 import type { NextPage } from "next";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -9,16 +10,23 @@ interface EnterForm {
 	email?: string;
 	phone?: string;
 }
+interface TokenForm {
+	token: string;
+}
 
-interface EnterMutationResult {
+interface MutationResult {
 	ok: boolean;
 }
 
 const Enter: NextPage = () => {
 	const [enter, { loading, data, error }] =
-		useMutation<EnterMutationResult>("/api/users/enter");
+		useMutation<MutationResult>("/api/users/enter");
+	const [confirmToken, { loading: tokenLoading, data: tokenData }] =
+		useMutation<MutationResult>("/api/users/confirm");
 
 	const { register, handleSubmit, reset } = useForm<EnterForm>();
+	const { register: tokenRegister, handleSubmit: tokenHandleSubmit } =
+		useForm<TokenForm>();
 	const [method, setMethod] = useState<"email" | "phone">("email");
 
 	const onEmailClick = () => {
@@ -32,12 +40,33 @@ const Enter: NextPage = () => {
 	const onValid = (validForm: EnterForm) => {
 		enter(validForm);
 	};
-	console.log(loading, data, error);
+	const onTokenValid = (validForm: TokenForm) => {
+		if (tokenLoading) return;
+		confirmToken(validForm);
+	};
+
 	return (
 		<div className="mt-16 px-4">
 			<h3 className="text-3xl font-bold text-center">Etner to Carrot</h3>
-			<div className="mt-12">
-				{data?.ok ? null : (
+			<div className="mt-16">
+				{data?.ok ? (
+					<form
+						onSubmit={tokenHandleSubmit(onTokenValid)}
+						className="flex flex-col mt-8 soace-y-4"
+					>
+						<Input
+							register={tokenRegister("token", {
+								required: true,
+							})}
+							name="token"
+							label="Confirm Token"
+							type="number"
+							required
+						/>
+
+						<Button text={loading ? "Loading" : "Confirm Token"} />
+					</form>
+				) : (
 					<>
 						<div className="flex flex-col items-center">
 							<h5 className="text-sm text-gray-500 font-medium">
@@ -72,33 +101,33 @@ const Enter: NextPage = () => {
 							onSubmit={handleSubmit(onValid)}
 							className="flex flex-col mt-8 soace-y-4"
 						>
-							<div className="mt-2">
-								{method === "email" ? (
-									<Input
-										register={register("email", {
-											required: true,
-										})}
-										name="email"
-										label="Email address"
-										type="email"
-										required
-									/>
-								) : null}
-								{method === "phone" ? (
-									<Input
-										register={register("phone")}
-										name="phone"
-										label="Phone Number"
-										type="number"
-										kind="phone"
-										required
-									/>
-								) : null}
-							</div>
-							<button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none">
-								{method === "email" ? "Get login link" : "Loading..."}
-								{method === "phone" ? "Get one-time password" : "Loading..."}
-							</button>
+							{method === "email" ? (
+								<Input
+									register={register("email", {
+										required: true,
+									})}
+									name="email"
+									label="Email address"
+									type="email"
+									required
+								/>
+							) : null}
+							{method === "phone" ? (
+								<Input
+									register={register("phone")}
+									name="phone"
+									label="Phone Number"
+									type="number"
+									kind="phone"
+									required
+								/>
+							) : null}
+							{method === "email" ? (
+								<Button text={loading ? "Loading" : "Get login link"} />
+							) : null}
+							{method === "phone" ? (
+								<Button text={loading ? "Loading" : "Get one-time password"} />
+							) : null}
 						</form>
 					</>
 				)}
