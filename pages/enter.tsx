@@ -10,7 +10,14 @@ interface EnterForm {
 	phone?: string;
 }
 
+interface EnterMutationResult {
+	ok: boolean;
+}
+
 const Enter: NextPage = () => {
+	const [enter, { loading, data, error }] =
+		useMutation<EnterMutationResult>("/api/users/enter");
+
 	const { register, handleSubmit, reset } = useForm<EnterForm>();
 	const [method, setMethod] = useState<"email" | "phone">("email");
 
@@ -22,80 +29,80 @@ const Enter: NextPage = () => {
 		reset();
 		setMethod("phone");
 	};
-	const onValid = (data: EnterForm) => {
-		fetch("/api/users/enter", {
-			method: "POST",
-			body: JSON.stringify(data),
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
+	const onValid = (validForm: EnterForm) => {
+		enter(validForm);
 	};
-
+	console.log(loading, data, error);
 	return (
 		<div className="mt-16 px-4">
 			<h3 className="text-3xl font-bold text-center">Etner to Carrot</h3>
 			<div className="mt-12">
-				<div className="flex flex-col items-center">
-					<h5 className="text-sm text-gray-500 font-medium">Enter Using:</h5>
-					<div className="grid border-b w-full mt-8 grid-cols-2">
-						<button
-							className={cls(
-								"pb-4 font-medium border-b-2 ",
-								method === "email"
-									? "border-orange-500 text-orange-400"
-									: "border-transparent text-gray-500"
-							)}
-							onClick={onEmailClick}
+				{data?.ok ? null : (
+					<>
+						<div className="flex flex-col items-center">
+							<h5 className="text-sm text-gray-500 font-medium">
+								Enter Using:
+							</h5>
+							<div className="grid border-b w-full mt-8 grid-cols-2">
+								<button
+									className={cls(
+										"pb-4 font-medium border-b-2 ",
+										method === "email"
+											? "border-orange-500 text-orange-400"
+											: "border-transparent text-gray-500"
+									)}
+									onClick={onEmailClick}
+								>
+									Email
+								</button>
+								<button
+									className={cls(
+										"pb-4 font-medium border-b-2 ",
+										method === "phone"
+											? "border-orange-500 text-orange-400"
+											: "border-transparent text-gray-500"
+									)}
+									onClick={onPhoneClick}
+								>
+									Phones
+								</button>
+							</div>
+						</div>
+						<form
+							onSubmit={handleSubmit(onValid)}
+							className="flex flex-col mt-8 soace-y-4"
 						>
-							Email
-						</button>
-						<button
-							className={cls(
-								"pb-4 font-medium border-b-2 ",
-								method === "phone"
-									? "border-orange-500 text-orange-400"
-									: "border-transparent text-gray-500"
-							)}
-							onClick={onPhoneClick}
-						>
-							Phones
-						</button>
-					</div>
-				</div>
+							<div className="mt-2">
+								{method === "email" ? (
+									<Input
+										register={register("email", {
+											required: true,
+										})}
+										name="email"
+										label="Email address"
+										type="email"
+										required
+									/>
+								) : null}
+								{method === "phone" ? (
+									<Input
+										register={register("phone")}
+										name="phone"
+										label="Phone Number"
+										type="number"
+										kind="phone"
+										required
+									/>
+								) : null}
+							</div>
+							<button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none">
+								{method === "email" ? "Get login link" : "Loading..."}
+								{method === "phone" ? "Get one-time password" : "Loading..."}
+							</button>
+						</form>
+					</>
+				)}
 			</div>
-			<form
-				onSubmit={handleSubmit(onValid)}
-				className="flex flex-col mt-8 soace-y-4"
-			>
-				<div className="mt-2">
-					{method === "email" ? (
-						<Input
-							register={register("email", {
-								required: true,
-							})}
-							name="email"
-							label="Email address"
-							type="email"
-							required
-						/>
-					) : null}
-					{method === "phone" ? (
-						<Input
-							register={register("phone")}
-							name="phone"
-							label="Phone Number"
-							type="number"
-							kind="phone"
-							required
-						/>
-					) : null}
-				</div>
-				<button className="mt-6 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 focus:outline-none">
-					{method === "email" ? "Get login link" : null}
-					{method === "phone" ? "Get one-time password" : null}
-				</button>
-			</form>
 
 			<div className="mt-8">
 				<div className="relative">
