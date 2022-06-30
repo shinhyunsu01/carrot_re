@@ -3,7 +3,7 @@ import { cls } from "../libs/client/utils";
 interface LayoutProps {
 	title?: string;
 	canGoBack?: boolean;
-	s;
+
 	hasTabBar?: boolean;
 	children: React.ReactNode;
 }
